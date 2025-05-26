@@ -28,9 +28,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 short int current = 0;
 
+void keyboard_post_init_user(void) {
+	layer_move(0);
+}
+
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if (record->event.key.row == 0 && record->event.key.col == 3 && record->event.pressed) {
-         current = get_highest_layer(layer_state);
+        current = get_highest_layer(layer_state);
         layer_move((current + 1) % 4);
         return false;  // blocca il normale comportamento del tasto
     }
@@ -180,20 +185,14 @@ const  char epd_bitmap_mappa_4 [] PROGMEM = {
 	0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x70, 0x70, 0x70, 0x78, 0x3c, 0x1f, 0x0f, 0x07, 0x00
 };
 
-// Array of all bitmaps for convenience. (Total bytes used to store images in PROGMEM = 2112)
-const int epd_bitmap_allArray_LEN = 4;
-const  char* epd_bitmap_allArray[4] = {
-	epd_bitmap_mappa_1,
-	epd_bitmap_mappa_2,
-	epd_bitmap_mappa_3,
-	epd_bitmap_mappa_4
-};
-
 
 
 bool oled_task_user(){
+
+	oled_clear();
     // Se il layer attivo è 0, mostra mappa_1, se è 1 mostra mappa_2, ecc.
-    switch (current) {
+	 uint8_t layer = get_highest_layer(layer_state);
+    switch (layer) {
         case 0:
             oled_write_raw_P(epd_bitmap_mappa_1, sizeof(epd_bitmap_mappa_1));
             break;
